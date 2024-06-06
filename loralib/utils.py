@@ -1,7 +1,9 @@
+# Source: https://github.com/SivanDoveh/TSVLC/blob/main/src/open_clip/loralib/layers.py
 #  ------------------------------------------------------------------------------------------
 #  Copyright (c) Microsoft Corporation. All rights reserved.
 #  Licensed under the MIT License (MIT). See LICENSE in the repo root for license information.
 #  ------------------------------------------------------------------------------------------
+#
 import torch
 import torch.nn as nn
 
