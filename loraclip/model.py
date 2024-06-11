@@ -465,8 +465,8 @@ class LoRACLIP(nn.Module):
                  transformer_width: int,
                  transformer_heads: int,
                  transformer_layers: int,
-                 r = 4,
-                 lora_mode: str = "vision+text"
+                 r: int,
+                 lora_mode: str
                  ):
         super().__init__()
 
@@ -485,8 +485,15 @@ class LoRACLIP(nn.Module):
             vision_heads = vision_width // 64
             
             if "vision" in lora_mode:
-                self.visual = LoRAVisionTransformer()
-            
+                self.visual = LoRAVisionTransformer(
+                    input_resolution=image_resolution,
+                    patch_size=vision_patch_size,
+                    width=vision_width,
+                    layers=vision_layers,
+                    heads=vision_heads,
+                    output_dim=embed_dim,
+                    r=r
+                )
             else:
                 self.visual = VisionTransformer(
                     input_resolution=image_resolution,
@@ -516,14 +523,19 @@ class LoRACLIP(nn.Module):
 
         self.vocab_size = vocab_size
 
-        # need LoRA on the Embedding module as well
-        self.token_embedding = lora.Embedding(vocab_size, transformer_width, r=r)
         self.positional_embedding = nn.Parameter(torch.empty(self.context_length, transformer_width))
         self.ln_final = LayerNorm(transformer_width)
+        self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
 
         self.text_projection = nn.Parameter(torch.empty(transformer_width, embed_dim))
-        self.lora_text_projection = lora.Linear(transformer_width, embed_dim, r=r, bias=False)
-        self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
+        
+        if "text" in lora_mode:
+            self.lora_text_projection = lora.Linear(transformer_width, embed_dim, r=r, bias=False)
+            self.token_embedding = lora.Embedding(vocab_size, transformer_width, r=r)
+        
+        else:
+            self.lora_text_projection = nn.Linear(transformer_width, embed_dim, bias=False)
+            self.token_embedding = nn.Embedding(vocab_size, transformer_width)
 
         self.initialize_parameters()
 
@@ -691,11 +703,11 @@ def build_LoRA_model(state_dict: dict, r: int, lora_mode: str):
     transformer_heads = transformer_width // 64
     transformer_layers = len(set(k.split(".")[2] for k in state_dict if k.startswith("transformer.resblocks")))
 
-    print(f"Making model with {embed_dim} dimension text encoder")
     model = LoRACLIP(
         embed_dim,
         image_resolution, vision_layers, vision_width, vision_patch_size,
-        context_length, vocab_size, transformer_width, transformer_heads, transformer_layers, r
+        context_length, vocab_size, transformer_width, transformer_heads, transformer_layers, 
+        r, lora_mode
     )
 
     for key in ["input_resolution", "context_length", "vocab_size"]:
