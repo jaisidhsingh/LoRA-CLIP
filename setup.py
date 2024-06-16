@@ -1,17 +1,18 @@
 from setuptools import setup, find_packages
 
 
+def parse_requirements(filename):
+    with open(filename, 'r') as f:
+        lines = f.read().splitlines()
+        # Filter out any empty lines or comments
+        return [line for line in lines if line and not line.startswith('#')]
+
+
 setup(
 	name="loraclip",
 	version="0.1.0",
 	packages=find_packages(),
-	install_requires=[
-		"numpy",
-		"torch",
-		"ftfy",
-		"regex",
-		"clip@git+https://github.com/openai/CLIP.git",
-	],
+	install_requires=parse_requirements("requirements.txt"),
     author='Jaisidh Singh',
     author_email='jaisidhsingh@gmail.com',
     description='A simple and efficient wrapper for LoRA-ifying CLIP.',

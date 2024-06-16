@@ -1,4 +1,4 @@
-# LoRA-CLIP: Easy Wrapper for LoRA-ifying CLIP
+# LoRA-CLIP: Easy Wrapper for LoRA-ifying CLIP <a href="https://pypi.org/project/loraclip/0.1.0/">(PyPI)</a>
 
 ### Features
 
@@ -12,7 +12,14 @@ Note: We currently only support Vision Transformer models in the LoRA-ification 
 
 ### Installation
 
-You can install this package directly using `pip` via the command `pip install loraclip`. Alternatively, you can consider buidling this from source by 
+IMPORTANT: make sure you have <a href="https://github.com/openai/CLIP">CLIP</a> before you install `loraclip`. This can simply be done by
+
+```bash
+pip install regex ftfy
+pip install git+https://github.com/openai/CLIP.git
+```
+
+You can then install this package directly using `pip` via the command `pip install loraclip`. Alternatively, you can consider buidling this from source by 
 
 ```bash
 git clone https://github.com/jaisidhsingh/LoRA-CLIP.git
