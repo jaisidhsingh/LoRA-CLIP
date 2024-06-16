@@ -10,6 +10,16 @@
 
 Note: We currently only support Vision Transformer models in the LoRA-ification of image encoders. ResNet models will be added soon.
 
+### Installation
+
+You can install this package directly using `pip` via the command `pip install loraclip`. Alternatively, you can consider buidling this from source by 
+
+```bash
+git clone https://github.com/jaisidhsingh/LoRA-CLIP.git
+cd LoRA-CLIP
+pip install -e .
+```
+
 ### Usage
 
 ```python
