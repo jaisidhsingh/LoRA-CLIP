@@ -731,5 +731,25 @@ def build_LoRA_model(state_dict: dict, r: int, lora_mode: str):
 
     print(" ")
 
+    # here we mark only lora parameters as trainable
     lora_utils.mark_only_lora_as_trainable(model)
-    return model # model.eval()
+    # some caveats for loading a model for fine-tuning:
+    if "text" in lora_mode:
+        for name, param in model.named_parameters():
+            if "positional_embedding" in name:
+                param.requires_grad = True
+            if "text_projection" in name:
+                param.requies_grad = True
+            if "logit_scale" in name:
+                param.requires_grad = True
+    
+    if "vision" in lora_mode:
+        for name, param in model.named_parameters():
+            if "visual.proj" in name:
+                param.requires_grad = True
+            if "visual.class_embedding" in name:
+                param.requires_grad = True
+            if "visual.positional_embedding" in name:
+                param.requires_grad = True
+            
+    return model.eval()
